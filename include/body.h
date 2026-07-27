@@ -18,9 +18,29 @@ Body(Body&&) = default; //move ctor
 Body& operator=(const Body&) = default; //assign operator copy
 Body& operator=(Body&&) = default; //assign operator move
 ~Body() = default; //dtor
+
+constexpr const Vector3d& get_pos() const;
+constexpr const Vector3d& get_speed() const;
+constexpr const Vector3d& get_force() const;
+constexpr double get_mass() const;
+
+constexpr void set_pos(const Vector3d&);
+constexpr void set_speed(const Vector3d&);
+constexpr void set_force(const Vector3d&);
+constexpr void set_mass(double);
 };
 
 constexpr Body::Body(const Vector3d& p, const Vector3d& s, const Vector3d& f, double m)
      : pos{p}, speed{s}, force{f}, mass{m} {
         if(mass <= 0.00) throw std::invalid_argument("mass must be positve");
 }
+   
+constexpr const Vector3d& Body::get_pos() const { return pos; }
+constexpr const Vector3d& Body::get_speed() const { return speed; }
+constexpr const Vector3d& Body::get_force() const { return force; }
+constexpr double Body::get_mass() const { return mass; }
+
+constexpr void Body::set_pos(const Vector3d& p) {pos = p;}
+constexpr void Body::set_speed(const Vector3d& s) {speed = s;}
+constexpr void Body::set_force(const Vector3d& f) {force = f;}
+constexpr void Body::set_mass(double m) {mass = m;}
