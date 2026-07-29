@@ -10,6 +10,10 @@ public:
     static constexpr double epsilon{1e-6};
     constexpr Vector3d(double _x=0.00, double _y=0.00, double _z=0.00);
     ~Vector3d() = default;
+    Vector3d(const Vector3d&) = default; //copy ctor
+    Vector3d(Vector3d&&) = default; //move ctor
+    Vector3d& operator=(const Vector3d&) = default; //assign operator copy
+    Vector3d& operator=(Vector3d&&) = default; //assign operator move
     constexpr double get_x() const;
     constexpr double get_y() const;
     constexpr double get_z() const;

@@ -8,7 +8,7 @@ private:
     Vector3d pos;
     Vector3d speed;
     Vector3d force;
-    double mass = 0.00;
+    double mass = 1.00;
 public:
 Body() = default;
 constexpr Body(const Vector3d&, const Vector3d&, const Vector3d&, double);
