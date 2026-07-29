@@ -19,10 +19,10 @@ public:
 void EulerIntegrator::step(std::vector<Body>& system, double dt) const{
     for(auto& particle : system){
         const double m = particle.get_mass();
-        //update force here if not constant
-        const Vector3d acc = particle.get_force()/m;
-        particle.set_speed(particle.get_speed() + acc*dt);
-        particle.set_pos(particle.get_pos() + particle.get_speed()*dt);
+        //update force/acc here if not constant
+        //const Vector3d acc = particle.get_acc()/m;
+        particle.set_vel(particle.get_vel() + particle.get_acc()*dt);
+        particle.set_pos(particle.get_pos() + particle.get_vel()*dt);
     }
 }
 
@@ -32,11 +32,11 @@ public:
     void step(std::vector<Body>&, double) const override final;
 };
 void RK4Integrator::step(std::vector<Body>& system, double dt) const{
-    for(auto& particle : system){
-        const double m = particle.get_mass();
-        particle.set_speed(particle.get_speed() + particle.get_force()/m*dt);
-        particle.set_pos(particle.get_pos() + particle.get_speed()*dt);
-    }
+    // for(auto& particle : system){
+    //     const double m = particle.get_mass();
+    //     particle.set_vel(particle.get_vel() + particle.get_acc()/m*dt);
+    //     particle.set_pos(particle.get_pos() + particle.get_vel()*dt);
+    // }
 }
 
 class VerletIntegrator : public Integrator
@@ -47,6 +47,10 @@ public:
 void VerletIntegrator::step(std::vector<Body>& system, double dt) const{
     for(auto& particle : system){
         const double m = particle.get_mass();
-        particle.set_pos();
+        const Vector3d acc_old = particle.get_acc();
+        particle.set_pos(particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5));
+        //update acc here 
+        //const Vector3d new_acc = particle.get_acc()/m;
+        particle.set_vel(particle.get_vel() + (particle.get_acc()+acc_old)*(dt*0.5));
     }
 }
