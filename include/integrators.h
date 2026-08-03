@@ -1,12 +1,16 @@
 #pragma once
 #include"body.h"
+#include"forcefields.h"
 #include<vector>
 #include<stdexcept>
+#include<memory>
+
+using ff_ptr = std::unique_ptr<ForceField>;
 
 class Integrator//interface
 {
 public:
-    virtual void step(std::vector<Body>&, std::vector<Vector3d>&, double) const = 0;
+    virtual void step(std::vector<Body>&, std::vector<Vector3d>&, const ff_ptr& ,double) const = 0;
     virtual ~Integrator() = default;
 };
 
@@ -14,17 +18,17 @@ public:
 class EulerIntegrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector3d>&, double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector3d>&, const ff_ptr&,  double) const override final;
 };
 
-void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, double dt) const{
+void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, const ff_ptr& ff, double dt) const{
     if(system.size() != accs.size()) throw std::invalid_argument("mismatch size of particles and accelerations");
     size_t n = system.size();
-    //update acc here with ff
     for (size_t i = 0; i < n; i++)
     {  
-        Body& particle {system.at(i)};
-        Vector3d& acc {accs.at(i)};
+        ff->compute(system, accs);
+        Body& particle {system[i]};
+        const Vector3d& acc {accs[i]};
         const double m = particle.get_mass();
         particle.set_vel(particle.get_vel() + acc*dt);
         particle.set_pos(particle.get_pos() + particle.get_vel()*dt);
@@ -35,23 +39,21 @@ void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& acc
 class RK4Integrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector3d>&, double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector3d>&, const ff_ptr&, double) const override final;
 };
-void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, double dt) const{
+void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, const ff_ptr& ff, double dt) const{
     if(system.size() != accs.size()) throw std::invalid_argument("mismatch size of particles and accelerations");
-    // for(auto& particle : system){
-    //     const double m = particle.get_mass();
-    //     particle.set_vel(particle.get_vel() + particle.get_acc()/m*dt);
-    //     particle.set_pos(particle.get_pos() + particle.get_vel()*dt);
-    // }
+    size_t n = system.size();
+    //v_new = v_old + 1/6*dt*(a1+2a2+2a3+a4)
+    //x_new = x_old + 1/6*dt*(v1+2v2+2v3+v4)
 }
 
 class VerletIntegrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector3d>&, double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector3d>&, const ff_ptr&, double) const override final;
 };
-void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, double dt) const{
+void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, const ff_ptr& ff, double dt) const{
     if(system.size() != accs.size()) throw std::invalid_argument("mismatch size of particles and accelerations");
     size_t n = system.size();
     const std::vector<Vector3d> accs_old{accs};
@@ -59,7 +61,7 @@ void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& ac
     for (size_t i = 0; i < n; i++)
     {
         Body& particle {system.at(i)};
-        Vector3d& acc {accs.at(i)};
+        const Vector3d& acc {accs.at(i)};
         const Vector3d& acc_old {accs_old.at(i)};
         const double m = particle.get_mass();
         
