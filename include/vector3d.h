@@ -72,11 +72,3 @@ constexpr double Vector3d::norm() const{
 constexpr double Vector3d::len_sqrd() const{
     return x*x+y*y+z*z;
 }
-void zero(std::vector<Vector3d>& vec){
-    for(auto& v : vec){
-        v.set_x(0.00);
-        v.set_y(0.00);
-        v.set_z(0.00);
-    }
-}
-

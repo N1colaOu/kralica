@@ -24,9 +24,9 @@ public:
 void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, const ff_ptr& ff, double dt) const{
     if(system.size() != accs.size()) throw std::invalid_argument("mismatch size of particles and accelerations");
     size_t n = system.size();
+    ff->compute(system, accs);
     for (size_t i = 0; i < n; i++)
     {  
-        ff->compute(system, accs);
         Body& particle {system[i]};
         const Vector3d& acc {accs[i]};
         const double m = particle.get_mass();
@@ -57,7 +57,7 @@ void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& ac
     if(system.size() != accs.size()) throw std::invalid_argument("mismatch size of particles and accelerations");
     size_t n = system.size();
     const std::vector<Vector3d> accs_old{accs};
-    //update accs with ff
+    ff->compute(system, accs);    
     for (size_t i = 0; i < n; i++)
     {
         Body& particle {system.at(i)};
@@ -65,7 +65,7 @@ void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& ac
         const Vector3d& acc_old {accs_old.at(i)};
         const double m = particle.get_mass();
         
-        particle.set_pos(particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5));
         particle.set_vel(particle.get_vel() + (acc+acc_old)*(dt*0.5));
+        particle.set_pos(particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5));
     }
 }
