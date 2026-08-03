@@ -1,6 +1,7 @@
 #pragma once
 #include<cmath>
-#include <stdexcept>
+#include<stdexcept>
+#include<vector>
 
 class Vector3d
 {
@@ -17,6 +18,9 @@ public:
     constexpr double get_x() const;
     constexpr double get_y() const;
     constexpr double get_z() const;
+    constexpr void set_x(double);
+    constexpr void set_y(double);
+    constexpr void set_z(double);
 
     constexpr Vector3d operator+(const Vector3d&) const;
     constexpr Vector3d operator-(const Vector3d&) const;
@@ -25,13 +29,17 @@ public:
     constexpr Vector3d operator*(double) const;
     constexpr Vector3d operator/(double) const;
     inline bool operator==(const Vector3d&) const;
-
+    constexpr double norm() const;
+    constexpr double len_sqrd() const;
 };
 
 constexpr Vector3d::Vector3d(double _x, double  _y, double _z) : x{_x}, y{_y}, z{_z} {}
 constexpr double Vector3d::get_x() const { return x; }
 constexpr double Vector3d::get_y() const { return y; }
 constexpr double Vector3d::get_z() const { return z; }
+constexpr void Vector3d::set_x(double _x) {x=_x;}
+constexpr void Vector3d::set_y(double _y) {y=_y;}
+constexpr void Vector3d::set_z(double _z) {z=_z;}
 
 constexpr Vector3d Vector3d::operator+(const Vector3d& v) const{
     return Vector3d{x+v.get_x(), y+v.get_y(), z+v.get_z()};
@@ -58,5 +66,17 @@ constexpr Vector3d Vector3d::operator/(double a) const{
 inline bool Vector3d::operator==(const Vector3d& v) const{
     return std::abs(x-v.get_x()) <= epsilon && std::abs(y-v.get_y()) <= epsilon && std::abs(z-v.get_z()) <= epsilon;
 }
-
+constexpr double Vector3d::norm() const{
+    return std::sqrt(x*x+y*y+z*z);
+}
+constexpr double Vector3d::len_sqrd() const{
+    return x*x+y*y+z*z;
+}
+void zero(std::vector<Vector3d>& vec){
+    for(auto& v : vec){
+        v.set_x(0.00);
+        v.set_y(0.00);
+        v.set_z(0.00);
+    }
+}
 
