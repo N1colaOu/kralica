@@ -9,13 +9,12 @@
 class BodyVis {
 public:
     BodyVis(int winW, int winH, float worldSize,
-            const std::string& title = "Gravity Simulation");
+            const std::string& title = "Simulation");
     ~BodyVis();
 
     bool isOpen() const;
     void clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
 
-    // Now use std::array<float,3> instead of float[3]
     void drawBodies(const std::vector<Body>& bodies,
                     const std::vector<std::array<float,3>>& colors);
     void drawBodies(const std::vector<Body>& bodies,

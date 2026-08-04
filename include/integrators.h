@@ -1,5 +1,4 @@
 #pragma once
-#include"body.h"
 #include"forcefields.h"
 #include<vector>
 #include<stdexcept>
