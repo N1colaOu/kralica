@@ -34,7 +34,7 @@ void GravityForce::compute(const std::vector<Body>& system, std::vector<Vector3d
             const double m_j = particle_j.get_mass();
             const Vector3d pos_j = particle_j.get_pos();
             const Vector3d rad_ij = (pos_j-pos_i);
-            const double rad_soft = 1/std::sqrt(rad_ij.len_sqrd() + GRAV_SOFT*GRAV_SOFT);
+            const double rad_soft = 1/std::sqrt(rad_ij.len_sqrd() + R_SOFT_GRAV*R_SOFT_GRAV);
             const double coeff = G*rad_soft*rad_soft*rad_soft;
             const Vector3d grav_force_ij{rad_ij*coeff};
 
@@ -66,10 +66,18 @@ void LennardJonesForce::compute(const std::vector<Body>& system, std::vector<Vec
             const double m_j = particle_j.get_mass();
             const Vector3d pos_j = particle_j.get_pos();
             const Vector3d rad_ij = (pos_j-pos_i);
-            const Vector3d lj_pot_ij;
-
-            accs[j] = accs[j] - lj_pot_ij/m_j;
-            accs[i] = accs[i] + lj_pot_ij/m_i;
+            const double rad_norm = rad_ij.norm();
+            if (rad_norm <= R_CRIT_LJ || rad_norm >= R_CUTOFF_LJ) continue;
+            const double rad_soft = 1/(rad_norm + R_SOFT_LJ);
+            const Vector3d r_hat = rad_ij/rad_norm;
+            double x = SIGMA_LJ * rad_soft;
+            double x2 = x * x;
+            double x6 = x2 * x2 * x2;
+            double x12 = x6 * x6;
+            double force_mag = 24.0 * EPSILON_LJ * rad_soft * (2.0 * x12 - x6);
+            const Vector3d lj_force_ij = r_hat*force_mag;
+            accs[j] = accs[j] - lj_force_ij/m_j;
+            accs[i] = accs[i] + lj_force_ij/m_i;
         }
     }
 }
