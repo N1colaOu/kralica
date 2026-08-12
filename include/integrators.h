@@ -7,6 +7,13 @@
 
 using ff_ptr = std::unique_ptr<ForceField>;
 
+inline double wrap(double x, double half_len) {
+    const double len = 2.0 * half_len;
+    x = std::fmod(x + half_len, len);
+    if (x <= 0.0) x += len;
+    return x - half_len;
+}
+
 class Integrator//interface
 {
 public:
@@ -56,29 +63,27 @@ public:
 void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& accs, const ff_ptr& ff, double dt) const{
     if(system.size() != accs.size()) throw std::invalid_argument("mismatch size of particles and accelerations");
     size_t n = system.size();
-    const std::vector<Vector3d> accs_old{accs};
-    ff->compute(system, accs);    
     for (size_t i = 0; i < n; i++)
     {
         Body& particle {system.at(i)};
         const Vector3d& acc {accs.at(i)};
-        const Vector3d& acc_old {accs_old.at(i)};
         const double m = particle.get_mass();
-        const double box_check = particle.get_pos().normInf();
         
-        particle.set_vel(particle.get_vel() + (acc+acc_old)*(dt*0.5));
-        if(box_check < BOX_SIZE){
-            particle.set_pos(particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5));
-        }
-        else{
-            if(particle.get_pos().get_max_el() < 0.00){
-                particle.set_pos((particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5)).mod(BOX_SIZE) 
-                + particle.get_pos().get_max_one()*BOX_SIZE);
-            }
-            else{
-                particle.set_pos((particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5)).mod(BOX_SIZE) 
-                - particle.get_pos().get_max_one()*BOX_SIZE);        
-            }
-        }
+        particle.set_vel(particle.get_vel() + acc*(dt*0.5));
+
+        Vector3d new_pos = particle.get_pos() + particle.get_vel()*dt + acc*(dt*dt*0.5);
+        new_pos.set_x(wrap(new_pos.get_x(), BOX_SIZE));
+        new_pos.set_y(wrap(new_pos.get_y(), BOX_SIZE));
+        new_pos.set_z(wrap(new_pos.get_z(), BOX_SIZE));
+        particle.set_pos(new_pos);
     }
+    ff->compute(system, accs);    
+    for (size_t i = 0; i < n; i++)
+    {
+        Body& particle {system.at(i)};
+        const Vector3d& acc {accs.at(i)};  
+        particle.set_vel(particle.get_vel() + acc*(dt*0.5));
+    }
+    
 }
+

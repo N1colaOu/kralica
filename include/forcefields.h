@@ -63,21 +63,18 @@ void LennardJonesForce::compute(const std::vector<Body>& system, std::vector<Vec
         for (size_t j = i + 1; j < n; j++)
         {
             const Body& particle_j = system[j];
-            const double m_j = particle_j.get_mass();
             const Vector3d pos_j = particle_j.get_pos();
             const Vector3d rad_ij = (pos_j-pos_i);
             const double rad_norm = rad_ij.norm();
-            if (rad_norm <= R_CRIT_LJ || rad_norm >= R_CUTOFF_LJ) continue;
-            const double rad_soft = 1/(rad_norm + R_SOFT_LJ);
-            const Vector3d r_hat = rad_ij/rad_norm;
-            double x = SIGMA_LJ * rad_soft;
-            double x2 = x * x;
-            double x6 = x2 * x2 * x2;
-            double x12 = x6 * x6;
-            double force_mag = 24.0 * EPSILON_LJ * rad_soft * (2.0 * x12 - x6);
-            const Vector3d lj_force_ij = r_hat*force_mag;
-            accs[j] = accs[j] - lj_force_ij/m_j;
-            accs[i] = accs[i] + lj_force_ij/m_i;
+            if (rad_norm >= R_CUTOFF_LJ) continue;
+            const double m_j = particle_j.get_mass();
+            const double x = SIGMA_LJ * SIGMA_LJ / (rad_norm * rad_norm + R_SOFT_LJ * R_SOFT_LJ);
+            double x3 = x * x * x;
+            double x6 = x3 * x3;
+            double force_mag = 24.0 * EPSILON_LJ * x / (SIGMA_LJ * SIGMA_LJ) * (2.0 * x6 - x3);
+            const Vector3d lj_force_ij = rad_ij*force_mag;
+            accs[j] = accs[j] + lj_force_ij/m_j;
+            accs[i] = accs[i] - lj_force_ij/m_i;
         }
     }
 }

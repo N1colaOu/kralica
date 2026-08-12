@@ -9,7 +9,7 @@
 
 int main() {
     // Simulation parameters
-    const size_t N = 150;        //particles
+    const size_t N = 400;        //particles
     const double v0 = 0.2;                   // typical velocity scale (root‑mean‑square)
     const double dt = 1e-4;               // time step
 
@@ -26,7 +26,7 @@ int main() {
 
     // Random number generator
     std::mt19937 rng(static_cast<unsigned>(std::time(nullptr)));
-    std::uniform_real_distribution<double> posDist(-BOX_SIZE, BOX_SIZE);   // positions in [-L/2, L/2]
+    std::uniform_real_distribution<double> posDist(-BOX_SIZE, BOX_SIZE); 
     std::normal_distribution<double> velDist(0.0, v0 / std::sqrt(3.0)); // Maxwell–Boltzmann component
 
     // Create bodies with random positions and velocities
