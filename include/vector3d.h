@@ -2,6 +2,7 @@
 #include<cmath>
 #include<stdexcept>
 #include<vector>
+#include<algorithm>
 
 class Vector3d
 {
@@ -30,7 +31,12 @@ public:
     constexpr Vector3d operator/(double) const;
     inline bool operator==(const Vector3d&) const;
     constexpr double norm() const;
+    constexpr double norm1() const; 
+    constexpr double normInf() const; 
     constexpr double len_sqrd() const;
+    constexpr Vector3d mod(double) const;
+    constexpr Vector3d get_max_one() const; 
+    constexpr double get_max_el() const; 
 };
 
 constexpr Vector3d::Vector3d(double _x, double  _y, double _z) : x{_x}, y{_y}, z{_z} {}
@@ -71,4 +77,33 @@ constexpr double Vector3d::norm() const{
 }
 constexpr double Vector3d::len_sqrd() const{
     return x*x+y*y+z*z;
+}
+constexpr Vector3d Vector3d::mod(double a) const{
+    return {std::fmod(x, a), std::fmod(y, a), std::fmod(z, a)};
+}
+constexpr double Vector3d::norm1() const{
+    return std::abs(x) + std::abs(y) + std::abs(z);
+}
+constexpr double Vector3d::normInf() const{
+    return std::max({std::abs(x), std::abs(y), std::abs(z)});
+}
+constexpr Vector3d Vector3d::get_max_one() const{
+    Vector3d base{0,0,0};
+    const double max_val = this->normInf();
+    if(std::abs(x) >= max_val) base.set_x(1.00);
+    if(std::abs(y) >= max_val) base.set_y(1.00);
+    if(std::abs(z) >= max_val) base.set_z(1.00);
+    return base;
+}
+constexpr double Vector3d::get_max_el() const{
+    const double z_m = std::abs(z);
+    const double x_m = std::abs(x);
+    const double y_m = std::abs(y);
+    if(z_m >= y_m && z_m >= x_m){
+        return z;
+    }
+    else if (y_m >= x_m && y_m >= z_m){
+        return y;
+    }
+    return x;
 }

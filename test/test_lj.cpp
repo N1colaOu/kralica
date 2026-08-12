@@ -9,10 +9,9 @@
 
 int main() {
     // Simulation parameters
-    const size_t N = 200;                     // number of particles
-    const double L = 2.0;                   // side length of cubic box
+    const size_t N = 150;        //particles
     const double v0 = 0.2;                   // typical velocity scale (root‑mean‑square)
-    const double dt = 0.001;                 // time step
+    const double dt = 1e-4;               // time step
 
     // Lennard‑Jones constants (reduced units, soft core for stability)
     // These constants are expected to be defined globally or in LennardJonesForce.
@@ -27,7 +26,7 @@ int main() {
 
     // Random number generator
     std::mt19937 rng(static_cast<unsigned>(std::time(nullptr)));
-    std::uniform_real_distribution<double> posDist(-L/2.0, L/2.0);   // positions in [-L/2, L/2]
+    std::uniform_real_distribution<double> posDist(-BOX_SIZE, BOX_SIZE);   // positions in [-L/2, L/2]
     std::normal_distribution<double> velDist(0.0, v0 / std::sqrt(3.0)); // Maxwell–Boltzmann component
 
     // Create bodies with random positions and velocities
@@ -58,7 +57,7 @@ int main() {
 
     // Visualization setup
     // Adjust the view scaling to accommodate the box
-    BodyVis vis(1980, 1080, static_cast<float>(L) * 0.6f, "Lennard-Jones Random Test");
+    BodyVis vis(BOX_SIZE*1000, BOX_SIZE*1000, static_cast<float>(BOX_SIZE)*2.0f, "Lennard-Jones Random Test");
 
     while (vis.isOpen()) {
         if (!vis.processEvents()) break;

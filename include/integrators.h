@@ -3,6 +3,7 @@
 #include<vector>
 #include<stdexcept>
 #include<memory>
+#include<cmath>
 
 using ff_ptr = std::unique_ptr<ForceField>;
 
@@ -63,8 +64,21 @@ void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector3d>& ac
         const Vector3d& acc {accs.at(i)};
         const Vector3d& acc_old {accs_old.at(i)};
         const double m = particle.get_mass();
+        const double box_check = particle.get_pos().normInf();
         
         particle.set_vel(particle.get_vel() + (acc+acc_old)*(dt*0.5));
-        particle.set_pos(particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5));
+        if(box_check < BOX_SIZE){
+            particle.set_pos(particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5));
+        }
+        else{
+            if(particle.get_pos().get_max_el() < 0.00){
+                particle.set_pos((particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5)).mod(BOX_SIZE) 
+                + particle.get_pos().get_max_one()*BOX_SIZE);
+            }
+            else{
+                particle.set_pos((particle.get_pos() + particle.get_vel()*dt + acc_old*(dt*dt*0.5)).mod(BOX_SIZE) 
+                - particle.get_pos().get_max_one()*BOX_SIZE);        
+            }
+        }
     }
 }
