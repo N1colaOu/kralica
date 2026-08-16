@@ -36,7 +36,7 @@ int main() {
     accs.push_back({{0.0,0.0}});
 
     std::unique_ptr<Integrator> verlet(new VerletIntegrator);
-    std::unique_ptr<ForceField> lj(new LennardJonesForce);
+    std::unique_ptr<ForceField> grav(new GravityForce);
     // Corrected: vector of std::array<float,3>
     std::vector<std::array<float,3>> colors = {
         {1.0f, 0.8f, 0.2f},  // yellow sun
@@ -44,11 +44,11 @@ int main() {
         {0.3f, 0.6f, 0.0f}//,   // blue planet
         //{1.0f, 0.6f, 1.0f}   // red planet
     };
-    const double dt = 0.0005;
+    const double dt = 0.005;
     while (vis.isOpen()) {
         if (!vis.processEvents()) break;
 
-        verlet->step(bodies, accs, lj, dt);
+        verlet->step(bodies, accs, grav, dt);
         vis.clear(0.02f, 0.02f, 0.05f);
         vis.drawBodies(bodies, colors);
         vis.display();

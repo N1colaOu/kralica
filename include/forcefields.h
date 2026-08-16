@@ -37,6 +37,7 @@ void GravityForce::compute(const std::vector<Body>& system, std::vector<Vector2d
             const Vector2d pos_j = particle_j.get_pos();
             const Vector2d rad_ij = (pos_j-pos_i);
             const double rad_norm = rad_ij.norm();
+            if (rad_norm <= R_CRIT_GRAV) continue;
             const double rad_soft = 1/std::sqrt(rad_norm*rad_norm + R_SOFT_GRAV*R_SOFT_GRAV);
             const double force_mag = G*rad_soft*rad_soft*rad_soft;
             const Vector2d grav_force_ij = rad_ij*force_mag;
