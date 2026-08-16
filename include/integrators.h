@@ -5,10 +5,6 @@
 #include<memory>
 #include<cmath>
 
-using kralica::Vector2d;
-
-using ff_ptr = std::unique_ptr<ForceField>;
-
 inline double wrap(double x, double half_len) {
     const double len = 2.0 * half_len;
     x = std::fmod(x + half_len, len);
@@ -19,7 +15,7 @@ inline double wrap(double x, double half_len) {
 class Integrator//interface
 {
 public:
-    virtual void step(std::vector<Body>&, std::vector<Vector2d>&, const ff_ptr& ,double) const = 0;
+    virtual void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>& ,double) const = 0;
     virtual ~Integrator() = default;
 };
 
@@ -27,15 +23,15 @@ public:
 class EulerIntegrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector2d>&, const ff_ptr&,  double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>&,  double) const override final;
 };
 
-void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const ff_ptr& ff, double dt) const{
+void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const std::unique_ptr<ForceField>& ff, double dt) const{
     if (system.size() != accs.size()){throw std::invalid_argument("mismatch size of particles and accelerations");}
     const size_t n = system.size();
     if (n == 0 || dt == 0.0){return;}
     if (!ff){throw std::invalid_argument("force field is null");}
-    ff->compute(system, accs);
+
     for (size_t i = 0; i < n; i++)
     {  
         Body& particle {system[i]};
@@ -43,15 +39,17 @@ void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& acc
         particle.set_vel(particle.get_vel() + acc*dt);
         particle.set_pos(particle.get_pos() + particle.get_vel()*dt);
     }
+    std::fill(accs.begin(), accs.end(), Vector2d({0.0, 0.0}));
+    ff->compute(system, accs);
     
 }
 
 class RK4Integrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector2d>&, const ff_ptr&, double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>&, double) const override final;
 };
-void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const ff_ptr& ff, double dt) const
+void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const std::unique_ptr<ForceField>& ff, double dt) const
 {
     if (system.size() != accs.size()){throw std::invalid_argument("mismatch size of particles and accelerations");}
     const size_t n = system.size();
@@ -137,9 +135,9 @@ void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs,
 class VerletIntegrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector2d>&, const ff_ptr&, double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>&, double) const override final;
 };
-void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const ff_ptr& ff, double dt) const{
+void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const std::unique_ptr<ForceField>& ff, double dt) const{
     if (system.size() != accs.size()){throw std::invalid_argument("mismatch size of particles and accelerations");}
     const size_t n = system.size();
     if (n == 0 || dt == 0.0){return;}
@@ -151,11 +149,12 @@ void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& ac
         
         particle.set_vel(particle.get_vel() + acc*(dt*0.5));
 
-        Vector2d new_pos = particle.get_pos() + particle.get_vel()*dt + acc*(dt*dt*0.5);
+        Vector2d new_pos = particle.get_pos() + particle.get_vel()*dt;
         new_pos[0] = (wrap(new_pos[0], BOX_SIZE));
         new_pos[1] = (wrap(new_pos[1], BOX_SIZE));
         particle.set_pos(new_pos);
     }
+    std::fill(accs.begin(), accs.end(), Vector2d({0.0, 0.0}));
     ff->compute(system, accs);    
     for (size_t i = 0; i < n; i++)
     {
