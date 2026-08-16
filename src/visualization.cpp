@@ -3,6 +3,9 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
+#include "vector.h"
+
+using kralica::Vector2d;
 
 // ----------------------------------------------------------------------
 // Internal shader sources (embedded as strings)
@@ -193,9 +196,9 @@ void BodyVis::drawBodies(const std::vector<Body>& bodies,
     glBindVertexArray(circleVAO);
 
     for (size_t i = 0; i < bodies.size(); ++i) {
-        const Vector3d& pos = bodies[i].get_pos();
+        const Vector2d& pos = bodies[i].get_pos();
 
-        glUniform2f(uOffsetLoc, pos.get_x(), pos.get_y());
+        glUniform2f(uOffsetLoc, pos[0], pos[1]);
         glUniform1f(uScaleLoc, radius);
 
         if (i < colors.size())
@@ -220,7 +223,7 @@ void BodyVis::drawBodies(const std::vector<Body>& bodies,
     glUniform3f(uColorLoc, r, g, b);
 
     for (const auto& body : bodies) {
-        glUniform2f(uOffsetLoc, body.get_pos().get_x(), body.get_pos().get_y());
+        glUniform2f(uOffsetLoc, body.get_pos()[0], body.get_pos()[1]);
         glUniform1f(uScaleLoc, radius);
         glDrawArrays(GL_TRIANGLE_FAN, 0, circleVertexCount);
     }

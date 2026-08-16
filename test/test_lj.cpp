@@ -7,6 +7,8 @@
 #include <print>
 #include <cmath>
 
+using kralica::Vector2d;
+
 int main() {
     // Simulation parameters
     const size_t N = 400;        //particles
@@ -33,14 +35,14 @@ int main() {
     std::vector<Body> bodies;
     bodies.reserve(N);
     for (size_t i = 0; i < N; ++i) {
-        Vector3d pos(posDist(rng), posDist(rng), 0);
-        Vector3d vel(velDist(rng), velDist(rng), 0);
+        Vector2d pos({posDist(rng), posDist(rng)});
+        Vector2d vel({velDist(rng), velDist(rng)});
         double mass = 1.0;   // all masses equal
         bodies.emplace_back(pos, vel, mass);
     }
 
     // Accelerations array (size N, zero initially)
-    std::vector<Vector3d> accs(N, Vector3d(0.0, 0.0, 0.0));
+    std::vector<Vector2d> accs(N, Vector2d({0.0, 0.0}));
 
     // Integrator and force field (ensure LJ constants are set appropriately!)
     std::unique_ptr<Integrator> verlet(new VerletIntegrator);
