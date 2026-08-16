@@ -9,7 +9,6 @@ class Body
 private:
     Vector2d pos;
     Vector2d vel;
-    //Vector2d acc;
     double mass = 1.00;
 public:
 Body() = default;
