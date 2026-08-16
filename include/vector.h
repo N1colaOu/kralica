@@ -17,6 +17,7 @@ namespace kralica{
         private:
         std::array<T, Dim> coords;
         public:
+        constexpr Vector();
         constexpr Vector(const std::array<T, Dim>&);
         constexpr const T& operator[](std::size_t) const;
         constexpr T& operator[](std::size_t);
@@ -38,7 +39,8 @@ namespace kralica{
         constexpr Vector normalized() const;
         constexpr Vector<T, 3> cross(const Vector<T, 3>&) const;
     };
-
+    template<arithmetic T, std::size_t Dim> requires (Dim >= 1)
+    constexpr Vector<T, Dim>::Vector() : coords{} {}
 
     template<arithmetic T, std::size_t Dim> requires (Dim >= 1)
     inline bool Vector<T, Dim>::operator==(const Vector<T, Dim>& v) const{
