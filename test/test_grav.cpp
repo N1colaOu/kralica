@@ -1,5 +1,5 @@
 #include"../include/visualization.h"
-#include"../include/integrators.h"
+#include"../include/simulation.h"
 #include<vector>
 #include<memory>
 
@@ -36,7 +36,6 @@ int main() {
     accs.push_back({{0.0,0.0}});
 
     std::unique_ptr<Integrator> verlet(new VerletIntegrator);
-    std::unique_ptr<ForceField> grav(new GravityForce);
     // Corrected: vector of std::array<float,3>
     std::vector<std::array<float,3>> colors = {
         {1.0f, 0.8f, 0.2f},  // yellow sun
@@ -45,14 +44,14 @@ int main() {
         //{1.0f, 0.6f, 1.0f}   // red planet
     };
     const double dt = 0.005;
-    while (vis.isOpen()) {
-        if (!vis.processEvents()) break;
-
-        verlet->step(bodies, accs, grav, dt);
-        vis.clear(0.02f, 0.02f, 0.05f);
-        vis.drawBodies(bodies, colors);
-        vis.display();
-    }
+    std::unique_ptr<ForceField> grav(new GravityForce);
+    std::unique_ptr<ForceField> lj(new LennardJonesForce);
+    std::vector<std::unique_ptr<ForceField>> field_vec;
+    field_vec.push_back(std::move(grav)); 
+    field_vec.push_back(std::move(lj)); 
+    CompositeField composite(std::move(field_vec));
+    Simulation sim{bodies, accs, verlet, composite, dt};
+    sim.run(10.0);
 
     return 0;
 }

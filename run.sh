@@ -1,1 +1,1 @@
-g++ -std=c++26 -O0 -Wall -Wextra -I ./include -I ./glad -o ./test_lj.exe test/test_lj.cpp src/visualization.cpp glad/glad.c -lglfw -ldl -lpthread
+g++ -std=c++26 -O0 -Wall -Wextra -I ./include -I ./glad -o ./test_grav_2.exe test/test_grav.cpp src/visualization.cpp glad/glad.c -lglfw -ldl -lpthread

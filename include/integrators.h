@@ -12,10 +12,10 @@ inline double wrap(double x, double half_len) {
     return x - half_len;
 }
 
-class Integrator//interface
+class Integrator
 {
 public:
-    virtual void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>& ,double) const = 0;
+    virtual void step(std::vector<Body>&, std::vector<Vector2d>&, const CompositeField& ,double) const = 0;
     virtual ~Integrator() = default;
 };
 
@@ -23,14 +23,14 @@ public:
 class EulerIntegrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>&,  double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector2d>&, const CompositeField&,  double) const override final;
 };
 
-void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const std::unique_ptr<ForceField>& ff, double dt) const{
+void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const CompositeField& ff, double dt) const{
     if (system.size() != accs.size()){throw std::invalid_argument("mismatch size of particles and accelerations");}
     const size_t n = system.size();
     if (n == 0 || dt == 0.0){return;}
-    if (!ff){throw std::invalid_argument("force field is null");}
+
 
     for (size_t i = 0; i < n; i++)
     {  
@@ -40,23 +40,42 @@ void EulerIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& acc
         particle.set_pos(particle.get_pos() + particle.get_vel()*dt);
     }
     std::fill(accs.begin(), accs.end(), Vector2d({0.0, 0.0}));
-    ff->compute(system, accs);
+    ff.compute(system, accs);
     
 }
 
 class RK4Integrator : public Integrator
 {
-public:
-    void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>&, double) const override final;
+    private:
+    std::vector<Vector2d> x0, v0;
+    std::vector<Vector2d> k1_dx, k1_dv;
+    std::vector<Vector2d> k2_dx, k2_dv;
+    std::vector<Vector2d> k3_dx, k3_dv;
+    std::vector<Vector2d> k4_dx, k4_dv;
+    std::vector<Vector2d> x, v;
+    public:
+    void step(std::vector<Body>&, std::vector<Vector2d>&, const CompositeField&, double) const override final;
 };
-void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const std::unique_ptr<ForceField>& ff, double dt) const
+void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const CompositeField& ff, double dt) const
 {
-    if (system.size() != accs.size()){throw std::invalid_argument("mismatch size of particles and accelerations");}
+    if(system.size() != accs.size()){throw std::invalid_argument("mismatch size of particles and accelerations");}
     const size_t n = system.size();
-    if (n == 0 || dt == 0.0){return;}
-    if (!ff){throw std::invalid_argument("force field is null");}
+    if(n == 0 || dt == 0.0){return;}
+    if(n > x0.size()){
+        x0.resize(n, Vector2d{0.0, 0.0});
+        v0.resize(n, Vector2d{0.0, 0.0});
+        k1_dx.resize(n, Vector2d{0.0, 0.0});
+        k1_dv.resize(n, Vector2d{0.0, 0.0});
+        k2_dx.resize(n, Vector2d{0.0, 0.0});
+        k2_dv.resize(n, Vector2d{0.0, 0.0});
+        k3_dx.resize(n, Vector2d{0.0, 0.0});
+        k3_dv.resize(n, Vector2d{0.0, 0.0});
+        k4_dx.resize(n, Vector2d{0.0, 0.0});
+        k4_dv.resize(n, Vector2d{0.0, 0.0});
+        x.resize(n, Vector2d{0.0, 0.0});
+        v.resize(n, Vector2d{0.0, 0.0});
+    }
 
-    std::vector<Vector2d> x0(n), v0(n);
 
     for (size_t i = 0; i < n; ++i)
     {
@@ -72,14 +91,9 @@ void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs,
             tmp[i] = Body(x[i], v[i], system[i].get_mass());
         }
         std::fill(a.begin(), a.end(), Vector2d({0.0, 0.0}));
-        ff->compute(tmp, a);
+        ff.compute(tmp, a);
     };
-    std::vector<Vector2d> k1_dx(n), k1_dv(n);
-    std::vector<Vector2d> k2_dx(n), k2_dv(n);
-    std::vector<Vector2d> k3_dx(n), k3_dv(n);
-    std::vector<Vector2d> k4_dx(n), k4_dv(n);
 
-    std::vector<Vector2d> x(n), v(n);
 
     // k1
     for (size_t i = 0; i < n; ++i){k1_dx[i] = v0[i];}
@@ -129,19 +143,19 @@ void RK4Integrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs,
         system[i].set_vel(new_vel);
     }
     std::fill(accs.begin(), accs.end(), Vector2d({0.0, 0.0}));
-    ff->compute(system, accs);
+    ff.compute(system, accs);
 }
 
 class VerletIntegrator : public Integrator
 {
 public:
-    void step(std::vector<Body>&, std::vector<Vector2d>&, const std::unique_ptr<ForceField>&, double) const override final;
+    void step(std::vector<Body>&, std::vector<Vector2d>&, const CompositeField&, double) const override final;
 };
-void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const std::unique_ptr<ForceField>& ff, double dt) const{
+void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& accs, const CompositeField& ff, double dt) const{
     if (system.size() != accs.size()){throw std::invalid_argument("mismatch size of particles and accelerations");}
     const size_t n = system.size();
     if (n == 0 || dt == 0.0){return;}
-    if (!ff){throw std::invalid_argument("force field is null");}
+
     for (size_t i = 0; i < n; i++)
     {
         Body& particle {system.at(i)};
@@ -155,7 +169,7 @@ void VerletIntegrator::step(std::vector<Body>& system, std::vector<Vector2d>& ac
         particle.set_pos(new_pos);
     }
     std::fill(accs.begin(), accs.end(), Vector2d({0.0, 0.0}));
-    ff->compute(system, accs);    
+    ff.compute(system, accs);    
     for (size_t i = 0; i < n; i++)
     {
         Body& particle {system.at(i)};

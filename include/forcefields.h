@@ -4,6 +4,7 @@
 #include"constants.h"
 #include"body.h"
 #include<algorithm>
+#include<memory>
 
 
 class ForceField
@@ -76,5 +77,20 @@ void LennardJonesForce::compute(const std::vector<Body>& system, std::vector<Vec
             accs[j] += lj_force_ij/m_j;
             accs[i] -= lj_force_ij/m_i;
         }
+    }
+}
+
+class CompositeField : public ForceField{
+    private:
+    std::vector<std::unique_ptr<ForceField>> force_fields;
+    public:
+    CompositeField(std::vector<std::unique_ptr<ForceField>>);
+    void compute(const std::vector<Body>&, std::vector<Vector2d>&) const override;
+};
+CompositeField::CompositeField(std::vector<std::unique_ptr<ForceField>> ffs) : force_fields(std::move(ffs)){}
+
+void CompositeField::compute(const std::vector<Body>& system, std::vector<Vector2d>& accs) const{
+    for(const auto& ffs : force_fields){
+        ffs->compute(system, accs);
     }
 }
