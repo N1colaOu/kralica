@@ -13,14 +13,14 @@ class Simulation{
     public:
     Simulation(const std::vector<Body>&,
             const std::vector<Vector2d>&, std::unique_ptr<Integrator>&, 
-        const CompositeField&, double);
+        CompositeField&, double);
     void step();
     void run(double);
 };
-Simulation::Simulation(std::vector<Body>& b,
-        std::vector<Vector2d>& a, std::unique_ptr<Integrator>& i, 
+Simulation::Simulation(const std::vector<Body>& b,
+        const std::vector<Vector2d>& a, std::unique_ptr<Integrator>& i, 
         CompositeField& ffs, double dt_) : 
-        system(std::move(b)), accs(std::move(a)), integrator(std::move(i)), force_fields(std::move(ffs)), dt(dt_){}
+        system(b), accs(a), integrator(std::move(i)), force_fields(ffs), dt(dt_){}
 
 void Simulation::step(){
     integrator->step(system, accs, force_fields, dt);
