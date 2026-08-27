@@ -50,8 +50,8 @@ int main() {
     field_vec.push_back(std::move(grav)); 
     field_vec.push_back(std::move(lj)); 
     CompositeField composite(std::move(field_vec));
-    Simulation sim{bodies, accs, verlet, composite, dt};
+    Simulation sim = Simulation(bodies, accs, verlet, composite, dt);
     sim.run(10.0);
-
+    
     return 0;
 }
