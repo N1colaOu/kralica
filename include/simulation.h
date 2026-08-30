@@ -46,7 +46,6 @@ namespace kralica{
             const Body& part = system[i];
             std::print("Pos: {}, Vel: {}, Acc: {}, Mass: {}", part.get_pos(), part.get_vel(), accs[i], part.get_mass());
         }
-        
         double energy{};
         energy = std::transform_reduce(system.begin(), system.end(), 0.00, std::plus<>(),
         [](const Body& x){
