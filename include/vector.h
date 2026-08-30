@@ -30,7 +30,7 @@ namespace kralica{
         constexpr Vector& operator-=(const Vector&);
         constexpr Vector& operator*=(T);
         constexpr Vector& operator/=(T);
-        inline bool operator==(const Vector&) const;
+        constexpr bool operator==(const Vector&) const;
         constexpr T dot(const Vector&) const;
         constexpr bool equal(const Vector&, double) const;
         constexpr T norm() const;
@@ -43,7 +43,7 @@ namespace kralica{
     constexpr Vector<T, Dim>::Vector() : coords{} {}
 
     template<arithmetic T, std::size_t Dim> requires (Dim >= 1)
-    inline bool Vector<T, Dim>::operator==(const Vector<T, Dim>& v) const{
+    constexpr bool Vector<T, Dim>::operator==(const Vector<T, Dim>& v) const{
         for (size_t i = 0; i < Dim; i++)
         {
             if(coords[i] != v[i]) return false;

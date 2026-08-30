@@ -1,4 +1,4 @@
-#include"../include/integrators.h"
+#include"../include/vector.h"
 #include<cmath>
 #include<stdexcept>
 #include<iostream>
@@ -24,5 +24,10 @@ void test_vectors(){
     constexpr Vector2d zero{{0.00, 0.00}};
     constexpr Vector2d rel_zero{{1e-9, 1e-9}};
     static_assert(zero.equal(rel_zero, 1e-9), "Vector Approximate Equality Error!");
+
+    constexpr Vector3d vc1{{1.00, 2.00, 3.00}};
+    constexpr Vector3d vc2{{1.00, -2.00, 3.00}};
+    constexpr Vector3d vc3{{12.00, 0.00, -4.00}};
+    static_assert(vc1.cross(vc2) == vc3);
 
 }
