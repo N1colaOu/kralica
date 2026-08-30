@@ -5,12 +5,14 @@
 #include<algorithm>
 #include<concepts>
 #include<stdexcept>
-
-
-template <typename T>
-concept arithmetic = std::signed_integral<T> || std::floating_point<T>;
+#include<format>
+#include<string>
+#include<iterator>
 
 namespace kralica{
+    
+    template <typename T>
+    concept arithmetic = std::signed_integral<T> || std::floating_point<T>;
     
     template<arithmetic T, std::size_t Dim> requires (Dim >= 1)
     class Vector{
@@ -38,6 +40,7 @@ namespace kralica{
         constexpr T normInf() const;
         constexpr Vector normalized() const;
         constexpr Vector<T, 3> cross(const Vector<T, 3>&) const;
+        friend struct std::formatter<Vector<T, Dim>>;
     };
     template<arithmetic T, std::size_t Dim> requires (Dim >= 1)
     constexpr Vector<T, Dim>::Vector() : coords{} {}
@@ -182,4 +185,20 @@ namespace kralica{
     using Vector3i = Vector<int, 3>;
     using Vector3f = Vector<float, 3>;
     using Vector3d = Vector<double, 3>;
+
 }
+namespace std{
+    template<kralica::arithmetic T, size_t Dim>
+    struct formatter<kralica::Vector<T, Dim>> : formatter<std::string>{
+        auto format(const kralica::Vector<T, Dim>& p, format_context& ctx) const {
+            string buffer{""};
+            auto out = back_inserter(buffer);
+            for (size_t i = 0; i < Dim-1; i++)
+            {
+                format_to(out, "{:.4f}, ", p.coords[i]);
+            }
+            format_to(out, "{:.4f}", p.coords[Dim-1]);
+            return formatter<string>::format(buffer, ctx);
+        }
+    };
+};
