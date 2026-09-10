@@ -60,16 +60,23 @@ namespace kralica{
     }
     void Simulation::log_statistics(std::ofstream& out) const{
         std::size_t n = system.size();      
-        for (size_t i = 0; i < n; i++)
+        for (size_t i = 0; i < n-1; i++)
         {
             const Body& part = system[i];
-            std::println(out, "{}", part.get_pos());
+            std::print(out, "{},", part.get_pos());
         }
+        std::println(out, "{}", system[n-1].get_pos());
     }
     void Simulation::run_and_log(double end_time, const std::string& file_name){
         std::ofstream out(file_name, std::ios::out | std::ios::trunc);
-        std::println(out, "{}, {}", dt, system.size());
-        std::println(out, "pos");
+        //std::println(out, "{}, {}", dt, system.size());
+        //std::println(out, "x,y");
+        for (size_t i = 0; i < system.size()-1; i++)
+        {
+            std::print(out, "x{},y{},", i, i);
+        }
+        std::println(out, "x{},y{}", system.size()-1, system.size()-1);
+        
         while(current_time <= end_time){
             log_statistics(out);
             step();

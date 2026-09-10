@@ -195,7 +195,7 @@ namespace std{
             auto out = back_inserter(buffer);
             for (size_t i = 0; i < Dim-1; i++)
             {
-                format_to(out, "{:.4f}, ", p.coords[i]);
+                format_to(out, "{:.4f},", p.coords[i]);
             }
             format_to(out, "{:.4f}", p.coords[Dim-1]);
             return formatter<string>::format(buffer, ctx);
