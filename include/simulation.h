@@ -69,8 +69,6 @@ namespace kralica{
     }
     void Simulation::run_and_log(double end_time, const std::string& file_name){
         std::ofstream out(file_name, std::ios::out | std::ios::trunc);
-        //std::println(out, "{}, {}", dt, system.size());
-        //std::println(out, "x,y");
         for (size_t i = 0; i < system.size()-1; i++)
         {
             std::print(out, "x{},y{},", i, i);
