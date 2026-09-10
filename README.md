@@ -6,9 +6,11 @@ Kralica is a modular C++ N-body simulation framework with configurable force fie
 
 The simulation output can be rendered as an MP4 animation from `./build/data.csv`.
 
-<p align="center">
-  <video src="./build/animation.mp4" controls width="720"></video>
-</p>
+
+
+https://github.com/user-attachments/assets/7fcf5ce9-7d8a-4245-9bdd-df932a6ea29a
+
+
 
 If your Markdown renderer does not support embedded video, use the link below:
 
