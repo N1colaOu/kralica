@@ -4,21 +4,22 @@ Kralica is a modular C++ N-body simulation framework with configurable force fie
 
 ## AI
 
-The use of AI in this project is limited to: helping debug, helping with project structure and grading the project.
+The use of AI in this project is limited to: helping debug, helping with project structure, writing the README and grading the project.
 
 ## Animation
 
-The simulation output can be rendered as an MP4 animation from `./build/data.csv`.
+Different simulation outputs can be rendered as an MP4 animation from `./build/data.csv`.
 
 
+Gravity:
 
-https://github.com/user-attachments/assets/7fcf5ce9-7d8a-4245-9bdd-df932a6ea29a
+https://github.com/user-attachments/assets/7fcf5ce9-7d8a-4245-9bdd-df932a6ea29a 
+
+Lennard Jones:
+
+https://github.com/user-attachments/assets/68209320-82d2-4f0a-92f6-4816738e3641
 
 
-
-If your Markdown renderer does not support embedded video, use the link below:
-
-- [Watch/download `animation.mp4`](./build/animation.mp4)
 
 ## Features
 
