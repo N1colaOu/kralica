@@ -1,0 +1,7 @@
+/home/nic/GithubRepos/kralica/build/CMakeFiles/edit_cache.dir
+/home/nic/GithubRepos/kralica/build/CMakeFiles/rebuild_cache.dir
+/home/nic/GithubRepos/kralica/build/libs/CMakeFiles/edit_cache.dir
+/home/nic/GithubRepos/kralica/build/libs/CMakeFiles/rebuild_cache.dir
+/home/nic/GithubRepos/kralica/build/src/CMakeFiles/main.dir
+/home/nic/GithubRepos/kralica/build/src/CMakeFiles/edit_cache.dir
+/home/nic/GithubRepos/kralica/build/src/CMakeFiles/rebuild_cache.dir
