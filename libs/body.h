@@ -1,5 +1,5 @@
 #pragma once
-#include"vector.h"
+#include<vector.h>
 #include<stdexcept>
 
 using kralica::Vector2d;
