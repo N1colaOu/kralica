@@ -1,3 +1,4 @@
+#pragma once
 #include<integrators.h>
 #include<memory>
 #include<vector>
@@ -25,7 +26,20 @@ namespace kralica{
         void run_and_log(double, const std::string&);
         void print_statistics() const;
         void log_statistics(std::ofstream&) const;
+        
+        const std::vector<Body>& get_bodies() const;
+        std::vector<Body>& get_bodies();
+        const std::vector<Vector2d>& get_accelerations() const;
+        double get_time() const;
+        double get_dt() const;
     };
+
+    const std::vector<Body>& Simulation::get_bodies() const {return system;}
+    std::vector<Body>& Simulation::get_bodies() {return system;}
+    const std::vector<Vector2d>& Simulation::get_accelerations() const {return accs;}
+    double Simulation::get_time() const {return current_time;}
+    double Simulation::get_dt() const {return dt;}
+
     Simulation::Simulation(const std::vector<Body>& b,
             const std::vector<Vector2d>& a, std::unique_ptr<Integrator>& i, 
             CompositeField& ffs, double dt_) : 
