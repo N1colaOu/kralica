@@ -63,8 +63,6 @@ namespace kralica{
             particle.set_vel(particle.get_vel() + acc*(dt*0.5));
     
             Vector2d new_pos = particle.get_pos() + particle.get_vel()*dt;
-            new_pos[0] = (wrap(new_pos[0], BOX_SIZE));
-            new_pos[1] = (wrap(new_pos[1], BOX_SIZE));
             particle.set_pos(new_pos);
         }
         std::fill(accs.begin(), accs.end(), Vector2d({0.0, 0.0}));
